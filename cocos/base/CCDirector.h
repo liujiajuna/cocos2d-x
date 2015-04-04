@@ -2,7 +2,7 @@
  Copyright (c) 2008-2010 Ricardo Quesada
  Copyright (c) 2010-2013 cocos2d-x.org
  Copyright (c) 2011      Zynga Inc.
- Copyright (c) 2013-2014 Chukong Technologies Inc.
+ Copyright (c) 2013-2015 Chukong Technologies Inc.
 
 http://www.cocos2d-x.org
 
@@ -41,7 +41,7 @@ THE SOFTWARE.
 NS_CC_BEGIN
 
 /**
- * @addtogroup base_nodes
+ * @addtogroup base
  * @{
  */
 
@@ -597,9 +597,14 @@ protected:
     /* Console for the director */
     Console *_console;
 
+    bool _isStatusLabelUpdated;
+
     // GLView will recreate stats labels to fit visible rect
     friend class GLView;
 };
+
+// end of base group
+/** @} */
 
 /** 
  @brief DisplayLinkDirector is a Director that synchronizes timers with the refresh rate of the display.
@@ -629,9 +634,6 @@ public:
 protected:
     bool _invalid;
 };
-
-// end of base_node group
-/// @}
 
 NS_CC_END
 

@@ -29,19 +29,22 @@ THE SOFTWARE.
 #include <string>
 #include "base/CCRef.h"
 
-NS_CC_BEGIN
-
 /**
- * @addtogroup base_nodes
- * @js NA
+ * @addtogroup base
  * @{
  */
+NS_CC_BEGIN
 
+
+/**
+ * A pool for managing autorlease objects.
+ * @js NA
+ */
 class CC_DLL AutoreleasePool
 {
 public:
     /**
-     * @warn Don't create an autorelease pool in heap, create it in stack.
+     * @warning Don't create an autorelease pool in heap, create it in stack.
      * @js NA
      * @lua NA
      */
@@ -49,7 +52,7 @@ public:
     
     /**
      * Create an autorelease pool with specific name. This name is useful for debugging.
-     * @warn Don't create an autorelease pool in heap, create it in stack.
+     * @warning Don't create an autorelease pool in heap, create it in stack.
      * @js NA
      * @lua NA
      *
@@ -140,8 +143,10 @@ private:
 #endif
 };
 
+// end of base group
+/** @} */
+
 /**
- * @js NA 
  * @cond
  */
 class CC_DLL PoolManager
@@ -179,9 +184,6 @@ private:
 /**
  * @endcond
  */
-
-// end of base_nodes group
-/// @}
 
 NS_CC_END
 

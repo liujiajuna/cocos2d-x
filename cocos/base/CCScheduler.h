@@ -38,11 +38,6 @@ THE SOFTWARE.
 
 NS_CC_BEGIN
 
-/**
- * @addtogroup global
- * @{
- */
-
 class Scheduler;
 
 typedef std::function<void(float)> ccSchedulerFunc;
@@ -141,6 +136,10 @@ private:
  * @endcond
  */
 
+/**
+ * @addtogroup base
+ * @{
+ */
 
 struct _listEntry;
 struct _hashSelectorEntry;
@@ -349,7 +348,7 @@ public:
     
 #if CC_ENABLE_SCRIPT_BINDING
     /** Unschedule a script entry. 
-     * @warn Don't invoke this function unless you know what you are doing.
+     * @warning Don't invoke this function unless you know what you are doing.
      * @js NA
      * @lua NA
      */
@@ -535,8 +534,8 @@ protected:
     std::mutex _performMutex;
 };
 
-// end of global group
-/// @}
+// end of base group
+/** @} */
 
 NS_CC_END
 

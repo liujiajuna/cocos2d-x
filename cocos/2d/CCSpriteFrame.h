@@ -37,7 +37,7 @@ NS_CC_BEGIN
 class Texture2D;
 
 /**
- * @addtogroup sprite_nodes
+ * @addtogroup _2d
  * @{
  */
 
@@ -126,7 +126,7 @@ public:
     inline const Rect& getRect() const { return _rect; }
     /** Set rect of the frame.
      *
-     * @param The rect of the sprite.
+     * @param rect The rect of the sprite.
      */
     void setRect(const Rect& rect);
 
@@ -233,7 +233,7 @@ protected:
     std::string  _textureFilename;
 };
 
-// end of sprite_nodes group
+// end of _2d group
 /// @}
 
 NS_CC_END

@@ -38,7 +38,7 @@ THE SOFTWARE.
 #endif
 
 /**
-* @addtogroup Audio
+* @addtogroup core
 * @{
 */
 
@@ -73,6 +73,7 @@ public:
      * Release the shared Engine object.
      *
      * @warning It must be called before the application exit, or it will lead to memory leaks.
+     * @lua destroyInstance
      */
     static void end();
 
