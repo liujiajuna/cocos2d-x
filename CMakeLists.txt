@@ -29,16 +29,16 @@ cmake_minimum_required(VERSION 2.8)
 # also from cmake's Modules dir, to not clash with per-project files.
 cmake_policy(SET CMP0017 NEW)
 
-# Use new behaviour with cmake >= 3.0:
+# Use new behaviour with cmake >= 3.1:
 # Only interpret if() arguments as variables or keywords when unquoted.
-if(CMAKE_VERSION VERSION_GREATER 3)
+if(CMAKE_VERSION VERSION_GREATER 3.1)
     cmake_policy(SET CMP0054 NEW)
 endif()
 
 project (Cocos2d-X)
 
 # The version number
-set(COCOS2D_X_VERSION 3.5)
+set(COCOS2D_X_VERSION 3.6)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake/Modules/")
 include(CocosBuildHelpers)
@@ -58,11 +58,15 @@ endif()
 set(BUILD_CPP_TESTS_DEFAULT ON)
 set(BUILD_LUA_LIBS_DEFAULT ON)
 set(BUILD_LUA_TESTS_DEFAULT ON)
+set(BUILD_JS_LIBS_DEFAULT OFF)
+set(BUILD_JS_TESTS_DEFAULT OFF)
 # TODO: fix test samples for MSVC
 if(MSVC)
   set(BUILD_CPP_TESTS_DEFAULT OFF)
   set(BUILD_LUA_LIBS_DEFAULT OFF)
   set(BUILD_LUA_TESTS_DEFAULT OFF)
+  set(BUILD_JS_LIBS_DEFAULT OFF)
+  set(BUILD_JS_TESTS_DEFAULT OFF)
 endif()
 
 option(USE_CHIPMUNK "Use chipmunk for physics library" ON)
@@ -77,6 +81,8 @@ option(BUILD_EDITOR_COCOSBUILDER "Build editor support for cocosbuilder" ON)
 option(BUILD_CPP_TESTS "Build TestCpp samples" ${BUILD_CPP_TESTS_DEFAULT})
 option(BUILD_LUA_LIBS "Build lua libraries" ${BUILD_LUA_LIBS_DEFAULT})
 option(BUILD_LUA_TESTS "Build TestLua samples" ${BUILD_LUA_TESTS_DEFAULT})
+option(BUILD_JS_LIBS "Build js libraries" ${BUILD_JS_LIBS_DEFAULT})
+option(BUILD_JS_TESTS "Build TestJS samples" ${BUILD_JS_TESTS_DEFAULT})
 option(USE_PREBUILT_LIBS "Use prebuilt libraries in external directory" ${USE_PREBUILT_LIBS_DEFAULT})
 
 if(USE_PREBUILT_LIBS AND MINGW)
@@ -314,3 +320,18 @@ if(BUILD_LUA_LIBS)
   endif(BUILD_LUA_TESTS)
 
 endif(BUILD_LUA_LIBS)
+
+## JS
+if(BUILD_JS_LIBS)
+  link_directories(
+    ${CMAKE_CURRENT_SOURCE_DIR}/external/spidermonkey/prebuilt/${PLATFORM_FOLDER}/${ARCH_DIR}
+  )
+
+  add_subdirectory(cocos/scripting/js-bindings)
+
+  # build js tests
+  if(BUILD_JS_TESTS)
+    add_subdirectory(tests/js-tests/project)
+  endif(BUILD_JS_TESTS)
+
+endif(BUILD_JS_LIBS)

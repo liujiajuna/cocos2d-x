@@ -38,6 +38,7 @@
 #include <algorithm>
 #include "../testResource.h"
 
+USING_NS_CC;
 
 Sprite3DTests::Sprite3DTests()
 {
@@ -87,7 +88,7 @@ std::string Sprite3DTestDemo::title() const
 //------------------------------------------------------------------
 Sprite3DForceDepthTest::Sprite3DForceDepthTest()
 {
-    auto orc = Sprite3D::create("Sprite3DTest/orc.c3b");
+    auto orc = cocos2d::Sprite3D::create("Sprite3DTest/orc.c3b");
     orc->setScale(5);
     orc->setNormalizedPosition(Vec2(.5f,.3f));
     orc->setPositionZ(40);
@@ -1264,7 +1265,7 @@ Sprite3DWithSkinTest::Sprite3DWithSkinTest()
     _menuItem->setPosition(VisibleRect::left().x + 50, VisibleRect::top().y -70);
     addChild(menu, 1);
     
-    _highQuality = true;
+    _animateQuality = (int)Animate3DQuality::QUALITY_HIGH;
     _sprits.clear();
     
     auto s = Director::getInstance()->getWinSize();
@@ -1307,7 +1308,7 @@ void Sprite3DWithSkinTest::addNewSpriteWithCoords(Vec2 p)
         }
         animate->setSpeed(inverse ? -speed : speed);
         animate->setTag(110);
-        animate->setHighQuality(_highQuality);
+        animate->setQuality((Animate3DQuality)_animateQuality);
         auto repeate = RepeatForever::create(animate);
         repeate->setTag(110);
         sprite->runAction(repeate);
@@ -1316,18 +1317,22 @@ void Sprite3DWithSkinTest::addNewSpriteWithCoords(Vec2 p)
 
 void Sprite3DWithSkinTest::switchAnimationQualityCallback(Ref* sender)
 {
-    _highQuality = !_highQuality;
+    ++_animateQuality;
+    if (_animateQuality > (int)Animate3DQuality::QUALITY_HIGH)
+        _animateQuality = (int)Animate3DQuality::QUALITY_NONE;
     
-    if (_highQuality)
-        _menuItem->setString("High Quality");
-    else
+    if (_animateQuality == (int)Animate3DQuality::QUALITY_NONE)
+        _menuItem->setString("None Quality");
+    else if (_animateQuality == (int)Animate3DQuality::QUALITY_LOW)
         _menuItem->setString("Low Quality");
+    else if (_animateQuality == (int)Animate3DQuality::QUALITY_HIGH)
+        _menuItem->setString("High Quality");
     
     for (auto iter: _sprits)
     {
         RepeatForever* repAction = dynamic_cast<RepeatForever*>(iter->getActionByTag(110));
         Animate3D* animate3D = dynamic_cast<Animate3D*>(repAction->getInnerAction());
-        animate3D->setHighQuality(_highQuality);
+        animate3D->setQuality((Animate3DQuality)_animateQuality);
     }
 }
 
@@ -2412,8 +2417,13 @@ std::string Sprite3DCubeMapTest::subtitle() const
 void Sprite3DCubeMapTest::addNewSpriteWithCoords(Vec2 p)
 {
     Size visibleSize = Director::getInstance()->getVisibleSize();
-    auto _camera = Camera::createPerspective(60, visibleSize.width / visibleSize.height, 0.1f, 200);
+    _camera = Camera::createPerspective(60, visibleSize.width / visibleSize.height, 10, 1000);
+    _camera->setPosition3D(Vec3(0.f, 0.f, 50.f));
     _camera->setCameraFlag(CameraFlag::USER1);
+
+    auto listener = EventListenerTouchAllAtOnce::create();
+    listener->onTouchesMoved = CC_CALLBACK_2(Sprite3DCubeMapTest::onTouchesMoved, this);
+    _eventDispatcher->addEventListenerWithSceneGraphPriority(listener, this);
 
     // create a teapot
     _teapot = Sprite3D::create("Sprite3DTest/teapot.c3b");
@@ -2432,8 +2442,8 @@ void Sprite3DCubeMapTest::addNewSpriteWithCoords(Vec2 p)
 
     //set texture parameters
     Texture2D::TexParams tRepeatParams;
-    tRepeatParams.magFilter = GL_NEAREST;
-    tRepeatParams.minFilter = GL_NEAREST;
+    tRepeatParams.magFilter = GL_LINEAR;
+    tRepeatParams.minFilter = GL_LINEAR;
     tRepeatParams.wrapS = GL_MIRRORED_REPEAT;
     tRepeatParams.wrapT = GL_MIRRORED_REPEAT;
     _textureCube->setTexParameters(tRepeatParams);
@@ -2442,7 +2452,7 @@ void Sprite3DCubeMapTest::addNewSpriteWithCoords(Vec2 p)
     state->setUniformTexture("u_cubeTex", _textureCube);
 
     _teapot->setGLProgramState(state);
-    _teapot->setPosition3D(Vec3(0, -5, -20));
+    _teapot->setPosition3D(Vec3(0, -5, 0));
     _teapot->setRotation3D(Vec3(-90, 180, 0));
 
     auto rotate_action = RotateBy::create(1.5, Vec3(0, 30, 0));
@@ -2464,8 +2474,6 @@ void Sprite3DCubeMapTest::addNewSpriteWithCoords(Vec2 p)
         offset += meshattribute.attribSizeBytes;
     }
     addChild(_teapot);
-    addChild(_camera);
-    setCameraMask(2);
 
     {
         // config skybox
@@ -2474,7 +2482,12 @@ void Sprite3DCubeMapTest::addNewSpriteWithCoords(Vec2 p)
 
         _skyBox->setTexture(_textureCube);
         addChild(_skyBox);
+
+        _skyBox->setScale(700.f);
     }
+
+    addChild(_camera);
+    setCameraMask(2);
 
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID || CC_TARGET_PLATFORM == CC_PLATFORM_WP8 || CC_TARGET_PLATFORM == CC_PLATFORM_WINRT)
     _backToForegroundListener = EventListenerCustom::create(EVENT_RENDERER_RECREATED,
@@ -2502,4 +2515,18 @@ void Sprite3DCubeMapTest::addNewSpriteWithCoords(Vec2 p)
     });
     Director::getInstance()->getEventDispatcher()->addEventListenerWithFixedPriority(_backToForegroundListener, 1);
 #endif
+}
+
+void Sprite3DCubeMapTest::onTouchesMoved(const std::vector<Touch*>& touches, cocos2d::Event  *event)
+{
+    if (touches.size())
+    {
+        auto touch = touches[0];
+        auto delta = touch->getDelta();
+
+        static float _angle = 0.f;
+        _angle -= CC_DEGREES_TO_RADIANS(delta.x);
+        _camera->setPosition3D(Vec3(50.0f * sinf(_angle), 0.0f, 50.0f * cosf(_angle)));
+        _camera->lookAt(Vec3(0.0f, 0.0f, 0.0f), Vec3(0.0f, 1.0f, 0.0f));
+    }
 }

@@ -2,6 +2,7 @@
 #include "../testResource.h"
 #include "renderer/CCRenderer.h"
 
+USING_NS_CC;
 using namespace ui;
 
 enum {
@@ -1191,7 +1192,7 @@ LabelShadowTest::LabelShadowTest()
     shadowLabelOutline->setPosition( Vec2(size.width/2, size.height*0.5f) );
     shadowLabelOutline->setTextColor( Color4B::RED );
     shadowLabelOutline->enableOutline(Color4B::YELLOW,1);
-    shadowLabelOutline->enableShadow(Color4B::BLACK);
+    shadowLabelOutline->enableShadow(Color4B::GREEN);
     addChild(shadowLabelOutline);
 
     shadowLabelBMFont = Label::createWithBMFont("fonts/bitmapFontTest.fnt", "BMFont:Shadow");
@@ -1234,7 +1235,7 @@ void LabelShadowTest::sliderEvent(Ref *pSender, ui::Slider::EventType type)
         auto offset = Size(slider->getPercent()-50,50 - slider2->getPercent());
         shadowLabelTTF->enableShadow(Color4B::BLACK,offset);
         shadowLabelBMFont->enableShadow(Color4B::GREEN,offset);
-        shadowLabelOutline->enableShadow(Color4B::BLACK,offset);
+        shadowLabelOutline->enableShadow(Color4B::GREEN,offset);
     }
 }
 
